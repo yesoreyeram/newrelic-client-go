@@ -1,10 +1,6 @@
 package alerts
 
 import (
-	"fmt"
-
-	"github.com/newrelic/newrelic-client-go/pkg/errors"
-
 	"github.com/newrelic/newrelic-client-go/internal/serialization"
 )
 
@@ -23,6 +19,16 @@ var (
 		PerConditionAndTarget: "PER_CONDITION_AND_TARGET",
 	}
 )
+
+type PolicyCaller interface {
+	// find(accountID int, name string) (*Policy, error)
+	list(accountID int, params *ListPoliciesParams) ([]Policy, error)
+
+	create(accountID int, policy Policy) (*Policy, error)
+	get(accountID int, policyID int) (*Policy, error)
+	update(accountID int, policy Policy) (*Policy, error)
+	remove(accountID int, policyID int) (*Policy, error) // delete is a reserved word...
+}
 
 // Policy represents a New Relic alert policy.
 type Policy struct {
@@ -62,88 +68,72 @@ type ListPoliciesParams struct {
 
 // ListPolicies returns a list of Alert Policies for a given account.
 func (a *Alerts) ListPolicies(params *ListPoliciesParams) ([]Policy, error) {
-	alertPolicies := []Policy{}
+	var method PolicyCaller
 
-	nextURL := "/alerts_policies.json"
-
-	for nextURL != "" {
-		response := alertPoliciesResponse{}
-		resp, err := a.client.Get(nextURL, &params, &response)
-
-		if err != nil {
-			return nil, err
-		}
-
-		alertPolicies = append(alertPolicies, response.Policies...)
-
-		paging := a.pager.Parse(resp)
-		nextURL = paging.Next
+	restCallerv := policyREST{
+		parent: a,
 	}
 
-	return alertPolicies, nil
+	method = &restCallerv
+
+	accountID := 0
+	return method.list(accountID, params)
 }
 
 // GetPolicy returns a specific alert policy by ID for a given account.
 func (a *Alerts) GetPolicy(id int) (*Policy, error) {
-	policies, err := a.ListPolicies(nil)
+	var method PolicyCaller
 
-	if err != nil {
-		return nil, err
+	restCaller := policyREST{
+		parent: a,
 	}
 
-	for _, policy := range policies {
-		if policy.ID == id {
-			return &policy, nil
-		}
-	}
+	method = &restCaller
 
-	return nil, errors.NewNotFoundf("no alert policy found for id %d", id)
+	accountID := 0
+	return method.get(accountID, id)
 }
 
 // CreatePolicy creates a new alert policy for a given account.
 func (a *Alerts) CreatePolicy(policy Policy) (*Policy, error) {
-	reqBody := alertPolicyRequestBody{
-		Policy: policy,
-	}
-	resp := alertPolicyResponse{}
+	var method PolicyCaller
 
-	_, err := a.client.Post("/alerts_policies.json", nil, &reqBody, &resp)
-
-	if err != nil {
-		return nil, err
+	restCaller := policyREST{
+		parent: a,
 	}
 
-	return &resp.Policy, nil
+	method = &restCaller
+
+	accountID := 0
+	return method.create(accountID, policy)
 }
 
 // UpdatePolicy update an alert policy for a given account.
 func (a *Alerts) UpdatePolicy(policy Policy) (*Policy, error) {
+	var method PolicyCaller
 
-	reqBody := alertPolicyRequestBody{
-		Policy: policy,
-	}
-	resp := alertPolicyResponse{}
-	url := fmt.Sprintf("/alerts_policies/%d.json", policy.ID)
-
-	_, err := a.client.Put(url, nil, &reqBody, &resp)
-	if err != nil {
-		return nil, err
+	restCaller := policyREST{
+		parent: a,
 	}
 
-	return &resp.Policy, nil
+	method = &restCaller
+
+	accountID := 0
+	return method.update(accountID, policy)
 }
 
 // DeletePolicy deletes an existing alert policy for a given account.
 func (a *Alerts) DeletePolicy(id int) (*Policy, error) {
-	resp := alertPolicyResponse{}
-	url := fmt.Sprintf("/alerts_policies/%d.json", id)
+	var method PolicyCaller
 
-	_, err := a.client.Delete(url, nil, &resp)
-	if err != nil {
-		return nil, err
+	restCaller := policyREST{
+		parent: a,
 	}
 
-	return &resp.Policy, nil
+	method = &restCaller
+
+	accountID := 0
+	return method.remove(accountID, id)
 }
 
 func (a *Alerts) CreatePolicyMutation(accountID int, policy QueryPolicyCreateInput) (*QueryPolicy, error) {
