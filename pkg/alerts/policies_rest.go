@@ -65,7 +65,7 @@ func (p *policyREST) create(accountID int, policy Policy) (*Policy, error) {
 }
 
 // update an alert policy for a given account.
-func (p *policyREST) update(accountID int, policy Policy) (*Policy, error) {
+func (p *policyREST) update(accountID int, policyID int, policy Policy) (*Policy, error) {
 
 	reqBody := alertPolicyRequestBody{
 		Policy: policy,
