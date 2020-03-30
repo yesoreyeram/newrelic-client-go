@@ -1,0 +1,6 @@
+---
+package: nerdstorage
+types:
+  - 'NerdStorageAccountScope'
+  - 'NerdStorageDocument'
+  - 'NerdStorageScopeInput'
