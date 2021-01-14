@@ -1362,6 +1362,11 @@ const getEntitySearchQuery = `query(
 	results {
 		entities {
 			__typename
+			account {
+				id
+				name
+				reportingEventTypes
+			}
 			accountId
 			domain
 			entityType
@@ -1370,83 +1375,312 @@ const getEntitySearchQuery = `query(
 			name
 			permalink
 			reporting
+			tags {
+				key
+				values
+			}
 			type
 			... on ApmApplicationEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
+				apmBrowserSummary {
+					ajaxRequestThroughput
+					ajaxResponseTimeAverage
+					jsErrorRate
+					pageLoadThroughput
+					pageLoadTimeAverage
+				}
+				apmSummary {
+					apdexScore
+					errorRate
+					hostCount
+					instanceCount
+					nonWebResponseTimeAverage
+					nonWebThroughput
+					responseTimeAverage
+					throughput
+					webResponseTimeAverage
+					webThroughput
+				}
 				applicationId
 				language
+				runningAgentVersions {
+					maxVersion
+					minVersion
+				}
+				settings {
+					apdexTarget
+					serverSideConfig
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on ApmDatabaseInstanceEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				host
 				portOrPath
+				tags {
+					key
+					values
+				}
 				vendor
 			}
 			... on ApmExternalServiceEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
+				externalSummary {
+					responseTimeAverage
+					throughput
+				}
 				host
+				tags {
+					key
+					values
+				}
 			}
 			... on BrowserApplicationEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				agentInstallType
 				alertSeverity
 				applicationId
+				browserSummary {
+					ajaxRequestThroughput
+					ajaxResponseTimeAverage
+					jsErrorRate
+					pageLoadThroughput
+					pageLoadTimeAverage
+					pageLoadTimeMedian
+					spaResponseTimeAverage
+					spaResponseTimeMedian
+				}
+				runningAgentVersions {
+					maxVersion
+					minVersion
+				}
 				servingApmApplicationId
+				settings {
+					apdexTarget
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on DashboardEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				dashboardParentGuid
+				tags {
+					key
+					values
+				}
 			}
 			... on GenericEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on GenericInfrastructureEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
 				integrationTypeCode
+				tags {
+					key
+					values
+				}
 			}
 			... on InfrastructureAwsLambdaFunctionEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
 				integrationTypeCode
 				runtime
+				tags {
+					key
+					values
+				}
 			}
 			... on InfrastructureHostEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
+				hostSummary {
+					cpuUtilizationPercent
+					diskUsedPercent
+					memoryUsedPercent
+					networkReceiveRate
+					networkTransmitRate
+					servicesCount
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on MobileApplicationEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
 				applicationId
+				mobileSummary {
+					appLaunchCount
+					crashCount
+					crashRate
+					httpErrorRate
+					httpRequestCount
+					httpRequestRate
+					httpResponseTimeAverage
+					mobileSessionCount
+					networkFailureRate
+					usersAffectedCount
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on SecureCredentialEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				description
 				secureCredentialId
+				secureCredentialSummary {
+					failingMonitorCount
+					monitorCount
+				}
+				tags {
+					key
+					values
+				}
 				updatedAt
 			}
 			... on SyntheticMonitorEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
 				monitorId
+				monitorSummary {
+					locationsFailing
+					locationsRunning
+					status
+					successRate
+				}
 				monitorType
 				monitoredUrl
 				period
+				tags {
+					key
+					values
+				}
 			}
 			... on ThirdPartyServiceEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
+				tags {
+					key
+					values
+				}
 			}
 			... on UnavailableEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
+				tags {
+					key
+					values
+				}
 			}
 			... on WorkloadEntityOutline {
 				__typename
+				account {
+					id
+					name
+					reportingEventTypes
+				}
 				alertSeverity
 				createdAt
+				createdByUser {
+					email
+					gravatar
+					id
+					name
+				}
+				tags {
+					key
+					values
+				}
 				updatedAt
+				workloadStatus {
+					description
+					statusSource
+					statusValue
+					summary
+				}
 			}
 		}
 		nextCursor
