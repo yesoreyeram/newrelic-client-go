@@ -20,6 +20,19 @@ var NerdStorageScopeTypes = struct {
 	ENTITY: "ENTITY",
 }
 
+// NerdStorageActorScope -
+type NerdStorageActorScope struct {
+	// Nerdpack documents are stored inside a collection.
+	// A collection can be thought of as a key-value storage where each document is one of these key-value pairs.
+	//
+	// To use the NerdStorage schema you must specify a Nerdpack ID using the NewRelic-Package-Id header in your request.
+	Collection []NerdStorageCollectionMember `json:"collection,omitempty"`
+	// A Nerdpack document is formed by an identifier (called documentId) and a set of data associated with it.
+	//
+	// To use the NerdStorage schema you must specify a Nerdpack ID using the NewRelic-Package-Id header in your request.
+	Document NerdStorageDocument `json:"document,omitempty"`
+}
+
 // NerdStorageCollectionMember -
 type NerdStorageCollectionMember struct {
 	// The NerdStorage document.

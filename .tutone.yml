@@ -551,6 +551,7 @@ packages:
     generators:
       - typegen
     types:
+      - name: NerdStorageActorScope
       - name: NerdStorageCollectionMember
       - name: NerdStorageDocument
       - name: NerdStorageEntityScope
@@ -650,6 +651,8 @@ packages:
     imports:
       - github.com/newrelic/newrelic-client-go/internal/serialization
     types:
+      - name: Date
+        create_as: string
       - name: DateTime
         create_as: string
       - name: EpochMilliseconds

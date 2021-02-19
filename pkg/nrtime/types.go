@@ -13,6 +13,9 @@ type TimeWindowInput struct {
 	StartTime EpochMilliseconds `json:"startTime"`
 }
 
+// Date - The `Date` scalar represents a date. The `Date` appears as an ISO8601 formatted string.
+type Date string
+
 // DateTime - The `DateTime` scalar represents a date and time. The `DateTime` appears as an ISO8601 formatted string.
 type DateTime string
 
