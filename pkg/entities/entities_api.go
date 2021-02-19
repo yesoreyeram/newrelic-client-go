@@ -195,6 +195,26 @@ const getEntitiesQuery = `query(
 	accountId
 	domain
 	entityType
+	goldenMetrics {
+		context {
+			account
+			guid
+		}
+		metrics {
+			name
+			query
+			title
+		}
+	}
+	goldenTags {
+		context {
+			account
+			guid
+		}
+		tags {
+			key
+		}
+	}
 	guid
 	indexedAt
 	name
@@ -775,6 +795,26 @@ const getEntityQuery = `query(
 	accountId
 	domain
 	entityType
+	goldenMetrics {
+		context {
+			account
+			guid
+		}
+		metrics {
+			name
+			query
+			title
+		}
+	}
+	goldenTags {
+		context {
+			account
+			guid
+		}
+		tags {
+			key
+		}
+	}
 	guid
 	indexedAt
 	name
