@@ -10,7 +10,8 @@ cache:
 
 # GraphQL endpoint to query for schema
 # Required
-endpoint: https://api.newrelic.com/graphql
+# endpoint: https://api.newrelic.com/graphql
+endpoint: https://localhost.newrelic.com:3100/graphql
 
 # How to authenticate to the API
 auth:
@@ -403,6 +404,9 @@ packages:
       - name: EntityTagValueWithMetadata
       - name: EntityTagWithMetadata
       - name: EntityType
+      - name: AiNotificationsAuth # union type (parent)
+      - name: AiNotificationsBasicAuth # object type
+      - name: AiNotificationsTokenAuth # object type
 
       # List of entities
       - name: Entity
@@ -415,6 +419,8 @@ packages:
           - "GetType() string"
           - "GetServiceLevel() ServiceLevelDefinition"
       - name: AlertableEntity
+        generate_struct_getters: true
+      - name: ApmAgentInstrumentedServiceEntity
         generate_struct_getters: true
       - name: ApmApplicationEntity
         generate_struct_getters: true
@@ -436,6 +442,8 @@ packages:
         generate_struct_getters: true
       - name: GenericInfrastructureEntity
         generate_struct_getters: true
+      - name: GenericServiceEntity
+        generate_struct_getters: true
       - name: InfrastructureAwsLambdaFunctionEntity
         generate_struct_getters: true
       - name: InfrastructureHostEntity
@@ -445,6 +453,8 @@ packages:
       - name: MobileApplicationEntity
         generate_struct_getters: true
       - name: SecureCredentialEntity
+        generate_struct_getters: true
+      - name: ServiceEntity
         generate_struct_getters: true
       - name: SyntheticMonitorEntity
         generate_struct_getters: true
@@ -464,6 +474,8 @@ packages:
           - "GetName() string"
           - "GetType() string"
       - name: AlertableEntityOutline
+        generate_struct_getters: true
+      - name: ApmAgentInstrumentedServiceEntityOutline
         generate_struct_getters: true
       - name: ApmApplicationEntityOutline
         generate_struct_getters: true
@@ -485,6 +497,8 @@ packages:
         generate_struct_getters: true
       - name: GenericInfrastructureEntityOutline
         generate_struct_getters: true
+      - name: GenericServiceEntityOutline
+        generate_struct_getters: true
       - name: InfrastructureAwsLambdaFunctionEntityOutline
         generate_struct_getters: true
       - name: InfrastructureHostEntityOutline
@@ -494,6 +508,8 @@ packages:
       - name: MobileApplicationEntityOutline
         generate_struct_getters: true
       - name: SecureCredentialEntityOutline
+        generate_struct_getters: true
+      - name: ServiceEntityOutline
         generate_struct_getters: true
       - name: SyntheticMonitorEntityOutline
         generate_struct_getters: true

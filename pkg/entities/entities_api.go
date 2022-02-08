@@ -267,10 +267,19 @@ const getEntitiesQuery = `query(
 	account {
 		id
 		name
+		region {
+			code
+			id
+			name
+		}
 		reportingEventTypes
 	}
 	accountId
 	alertSeverity
+	alertStatus
+	dashboardTemplates {
+		mosaicTemplate
+	}
 	domain
 	entityType
 	goldenMetrics {
@@ -282,7 +291,25 @@ const getEntitiesQuery = `query(
 			name
 			query
 			title
+			unit
 		}
+	}
+	goldenSignalValues {
+		fullyQualifiedSignalName
+		name
+		summaryValue
+		units
+		values
+	}
+	goldenSignalValuesV2 {
+		signalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		timeIndex
 	}
 	goldenTags {
 		context {
@@ -300,6 +327,7 @@ const getEntitiesQuery = `query(
 	recentAlertViolations {
 		agentUrl
 		alertSeverity
+		alertStatus
 		closedAt
 		label
 		level
@@ -307,7 +335,131 @@ const getEntitiesQuery = `query(
 		violationId
 		violationUrl
 	}
+	recommendedServiceLevel {
+		indicators {
+			category
+			description
+			name
+		}
+	}
+	relatedDashboards {
+		dashboardGuids
+		dashboards {
+			__typename
+			accountId
+			alertSeverity
+			alertStatus
+			domain
+			entityType
+			guid
+			indexedAt
+			name
+			permalink
+			reporting
+			type
+			... on ApmAgentInstrumentedServiceEntityOutline {
+				__typename
+				applicationId
+				language
+			}
+			... on ApmApplicationEntityOutline {
+				__typename
+				applicationId
+				language
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+				}
+			}
+			... on ApmDatabaseInstanceEntityOutline {
+				__typename
+				host
+				portOrPath
+				vendor
+			}
+			... on ApmExternalServiceEntityOutline {
+				__typename
+				host
+			}
+			... on BrowserApplicationEntityOutline {
+				__typename
+				agentInstallType
+				applicationId
+				servingApmApplicationId
+			}
+			... on DashboardEntityOutline {
+				__typename
+				createdAt
+				dashboardParentGuid
+				permissions
+				updatedAt
+			}
+			... on ExternalEntityOutline {
+				__typename
+			}
+			... on GenericEntityOutline {
+				__typename
+			}
+			... on GenericInfrastructureEntityOutline {
+				__typename
+				integrationTypeCode
+			}
+			... on GenericServiceEntityOutline {
+				__typename
+			}
+			... on InfrastructureAwsLambdaFunctionEntityOutline {
+				__typename
+				integrationTypeCode
+				runtime
+			}
+			... on InfrastructureHostEntityOutline {
+				__typename
+			}
+			... on MobileApplicationEntityOutline {
+				__typename
+				applicationId
+			}
+			... on SecureCredentialEntityOutline {
+				__typename
+				description
+				secureCredentialId
+				updatedAt
+			}
+			... on ServiceEntityOutline {
+				__typename
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+					applicationId
+					language
+				}
+				... on GenericServiceEntityOutline {
+					__typename
+				}
+			}
+			... on SyntheticMonitorEntityOutline {
+				__typename
+				monitorId
+				monitorType
+				monitoredUrl
+				period
+			}
+			... on ThirdPartyServiceEntityOutline {
+				__typename
+				... on GenericServiceEntityOutline {
+					__typename
+				}
+			}
+			... on UnavailableEntityOutline {
+				__typename
+			}
+			... on WorkloadEntityOutline {
+				__typename
+				createdAt
+				updatedAt
+			}
+		}
+	}
 	relatedEntities {
+		count
 		nextCursor
 		results {
 			__typename
@@ -345,6 +497,22 @@ const getEntitiesQuery = `query(
 			updatedAt
 		}
 	}
+	summaryMetrics {
+		name
+		title
+		value {
+			__typename
+			unit
+			... on EntitySummaryNumericMetricValue {
+				__typename
+				numericValue
+			}
+			... on EntitySummaryStringMetricValue {
+				__typename
+				stringValue
+			}
+		}
+	}
 	tags {
 		key
 		values
@@ -356,8 +524,15 @@ const getEntitiesQuery = `query(
 			value
 		}
 	}
+	tracingSummary {
+		errorTraceCount
+		percentOfAllErrorTraces
+	}
 	type
-	... on ApmApplicationEntity {
+	uiTemplates {
+		template
+	}
+	... on ApmAgentInstrumentedServiceEntity {
 		__typename
 		account {
 			id
@@ -370,6 +545,9 @@ const getEntitiesQuery = `query(
 			jsErrorRate
 			pageLoadThroughput
 			pageLoadTimeAverage
+		}
+		apmSettings {
+			tracerType
 		}
 		apmSummary {
 			apdexScore
@@ -384,6 +562,9 @@ const getEntitiesQuery = `query(
 			webThroughput
 		}
 		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		deployments {
 			changelog
 			description
@@ -392,6 +573,19 @@ const getEntitiesQuery = `query(
 			timestamp
 			user
 		}
+		errorGroupCount {
+			count
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		language
 		metricNormalizationRules {
 			action
@@ -399,14 +593,23 @@ const getEntitiesQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
+		}
+		recentAgentActivity {
+			activityType
+			description
+			permalink
+			timestamp
 		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -414,7 +617,11 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -428,12 +635,148 @@ const getEntitiesQuery = `query(
 			apdexTarget
 			serverSideConfig
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+	}
+	... on ApmApplicationEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		apmBrowserSummary {
+			ajaxRequestThroughput
+			ajaxResponseTimeAverage
+			jsErrorRate
+			pageLoadThroughput
+			pageLoadTimeAverage
+		}
+		apmSettings {
+			tracerType
+		}
+		apmSummary {
+			apdexScore
+			errorRate
+			hostCount
+			instanceCount
+			nonWebResponseTimeAverage
+			nonWebThroughput
+			responseTimeAverage
+			throughput
+			webResponseTimeAverage
+			webThroughput
+		}
+		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		deployments {
+			changelog
+			description
+			permalink
+			revision
+			timestamp
+			user
+		}
+		errorGroupCount {
+			count
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		language
+		metricNormalizationRules {
+			action
+			applicationGuid
+			applicationName
+			createdAt
+			enabled
+			evalOrder
+			id
+			matchExpression
+			notes
+			replacement
+			terminateChain
+		}
+		recentAgentActivity {
+			activityType
+			description
+			permalink
+			timestamp
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		runningAgentVersions {
+			maxVersion
+			minVersion
+		}
+		settings {
+			apdexTarget
+			serverSideConfig
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on ApmAgentInstrumentedServiceEntity {
+			__typename
 		}
 	}
 	... on ApmDatabaseInstanceEntity {
@@ -443,11 +786,25 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		host
 		portOrPath
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -455,11 +812,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -467,6 +832,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 		vendor
 	}
@@ -477,14 +849,28 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		externalSummary {
 			responseTimeAverage
 			throughput
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
 		}
 		host
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -492,11 +878,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -504,6 +898,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on BrowserApplicationEntity {
@@ -525,20 +926,36 @@ const getEntitiesQuery = `query(
 			spaResponseTimeAverage
 			spaResponseTimeMedian
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		metricNormalizationRules {
 			action
 			applicationGuid
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -546,7 +963,11 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -560,12 +981,23 @@ const getEntitiesQuery = `query(
 		settings {
 			apdexTarget
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on DashboardEntity {
@@ -576,12 +1008,29 @@ const getEntitiesQuery = `query(
 			reportingEventTypes
 		}
 		createdAt
+		createdAtInternal
 		dashboardParentGuid
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		description
+		descriptionInternal
+		editableInternal
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		owner {
 			email
 			userId
 		}
+		ownerEmailInternal
 		pages {
 			createdAt
 			description
@@ -589,10 +1038,22 @@ const getEntitiesQuery = `query(
 			name
 			updatedAt
 		}
+		pagesInternal {
+			createdAt
+			description
+			editable
+			gridColumnCount
+			guid
+			name
+			ownerEmail
+			updatedAt
+			visibility
+		}
 		permissions
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -600,11 +1061,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -613,7 +1082,16 @@ const getEntitiesQuery = `query(
 		tagsWithMetadata {
 			key
 		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
 		updatedAt
+		updatedAtInternal
+		visibilityInternal
 	}
 	... on ExternalEntity {
 		__typename
@@ -622,9 +1100,23 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -632,11 +1124,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -644,6 +1144,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on GenericEntity {
@@ -653,9 +1160,23 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -663,11 +1184,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -675,6 +1204,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on GenericInfrastructureEntity {
@@ -684,10 +1220,24 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		integrationTypeCode
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -695,11 +1245,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -707,6 +1265,73 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+	}
+	... on GenericServiceEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on InfrastructureAwsLambdaFunctionEntity {
@@ -716,10 +1341,24 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		integrationTypeCode
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -727,19 +1366,34 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
 		}
 		runtime
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on InfrastructureHostEntity {
@@ -748,6 +1402,26 @@ const getEntitiesQuery = `query(
 			id
 			name
 			reportingEventTypes
+		}
+		availableServices {
+			displayName
+			guid
+			processId
+			status
+			strategy
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
 		}
 		hostSummary {
 			cpuUtilizationPercent
@@ -760,6 +1434,7 @@ const getEntitiesQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -767,11 +1442,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -779,6 +1462,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on MobileApplicationEntity {
@@ -789,16 +1479,31 @@ const getEntitiesQuery = `query(
 			reportingEventTypes
 		}
 		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		metricNormalizationRules {
 			action
 			applicationGuid
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		mobileSummary {
 			appLaunchCount
@@ -815,6 +1520,7 @@ const getEntitiesQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -822,11 +1528,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -834,6 +1548,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on SecureCredentialEntity {
@@ -843,10 +1564,24 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		description
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -854,7 +1589,11 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -865,6 +1604,10 @@ const getEntitiesQuery = `query(
 			failingMonitorCount
 			monitorCount
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
@@ -872,7 +1615,82 @@ const getEntitiesQuery = `query(
 		tagsWithMetadata {
 			key
 		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
 		updatedAt
+	}
+	... on ServiceEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on ApmAgentInstrumentedServiceEntity {
+			__typename
+			applicationId
+			language
+		}
+		... on GenericServiceEntity {
+			__typename
+		}
 	}
 	... on SyntheticMonitorEntity {
 		__typename
@@ -881,8 +1699,24 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		monitorId
 		monitorSummary {
+			loadSizeAverage
+			loadTimeP50
+			loadTimeP95
 			locationsFailing
 			locationsRunning
 			status
@@ -894,6 +1728,7 @@ const getEntitiesQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -901,11 +1736,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -913,6 +1756,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on ThirdPartyServiceEntity {
@@ -922,9 +1772,23 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -932,11 +1796,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -944,6 +1816,16 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on GenericServiceEntity {
+			__typename
 		}
 	}
 	... on UnavailableEntity {
@@ -953,9 +1835,23 @@ const getEntitiesQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -963,11 +1859,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -975,6 +1879,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on WorkloadEntity {
@@ -991,9 +1902,31 @@ const getEntitiesQuery = `query(
 			id
 			name
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		errorGroupCount {
+			count
+		}
+		errorGroupNotificationPolicy {
+			id
+			name
+			workloadGuid
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1001,11 +1934,19 @@ const getEntitiesQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1013,6 +1954,13 @@ const getEntitiesQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 		updatedAt
 		workloadStatus {
@@ -1063,10 +2011,19 @@ const getEntityQuery = `query(
 	account {
 		id
 		name
+		region {
+			code
+			id
+			name
+		}
 		reportingEventTypes
 	}
 	accountId
 	alertSeverity
+	alertStatus
+	dashboardTemplates {
+		mosaicTemplate
+	}
 	domain
 	entityType
 	goldenMetrics {
@@ -1078,7 +2035,25 @@ const getEntityQuery = `query(
 			name
 			query
 			title
+			unit
 		}
+	}
+	goldenSignalValues {
+		fullyQualifiedSignalName
+		name
+		summaryValue
+		units
+		values
+	}
+	goldenSignalValuesV2 {
+		signalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		timeIndex
 	}
 	goldenTags {
 		context {
@@ -1096,6 +2071,7 @@ const getEntityQuery = `query(
 	recentAlertViolations {
 		agentUrl
 		alertSeverity
+		alertStatus
 		closedAt
 		label
 		level
@@ -1103,7 +2079,131 @@ const getEntityQuery = `query(
 		violationId
 		violationUrl
 	}
+	recommendedServiceLevel {
+		indicators {
+			category
+			description
+			name
+		}
+	}
+	relatedDashboards {
+		dashboardGuids
+		dashboards {
+			__typename
+			accountId
+			alertSeverity
+			alertStatus
+			domain
+			entityType
+			guid
+			indexedAt
+			name
+			permalink
+			reporting
+			type
+			... on ApmAgentInstrumentedServiceEntityOutline {
+				__typename
+				applicationId
+				language
+			}
+			... on ApmApplicationEntityOutline {
+				__typename
+				applicationId
+				language
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+				}
+			}
+			... on ApmDatabaseInstanceEntityOutline {
+				__typename
+				host
+				portOrPath
+				vendor
+			}
+			... on ApmExternalServiceEntityOutline {
+				__typename
+				host
+			}
+			... on BrowserApplicationEntityOutline {
+				__typename
+				agentInstallType
+				applicationId
+				servingApmApplicationId
+			}
+			... on DashboardEntityOutline {
+				__typename
+				createdAt
+				dashboardParentGuid
+				permissions
+				updatedAt
+			}
+			... on ExternalEntityOutline {
+				__typename
+			}
+			... on GenericEntityOutline {
+				__typename
+			}
+			... on GenericInfrastructureEntityOutline {
+				__typename
+				integrationTypeCode
+			}
+			... on GenericServiceEntityOutline {
+				__typename
+			}
+			... on InfrastructureAwsLambdaFunctionEntityOutline {
+				__typename
+				integrationTypeCode
+				runtime
+			}
+			... on InfrastructureHostEntityOutline {
+				__typename
+			}
+			... on MobileApplicationEntityOutline {
+				__typename
+				applicationId
+			}
+			... on SecureCredentialEntityOutline {
+				__typename
+				description
+				secureCredentialId
+				updatedAt
+			}
+			... on ServiceEntityOutline {
+				__typename
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+					applicationId
+					language
+				}
+				... on GenericServiceEntityOutline {
+					__typename
+				}
+			}
+			... on SyntheticMonitorEntityOutline {
+				__typename
+				monitorId
+				monitorType
+				monitoredUrl
+				period
+			}
+			... on ThirdPartyServiceEntityOutline {
+				__typename
+				... on GenericServiceEntityOutline {
+					__typename
+				}
+			}
+			... on UnavailableEntityOutline {
+				__typename
+			}
+			... on WorkloadEntityOutline {
+				__typename
+				createdAt
+				updatedAt
+			}
+		}
+	}
 	relatedEntities {
+		count
 		nextCursor
 		results {
 			__typename
@@ -1141,6 +2241,22 @@ const getEntityQuery = `query(
 			updatedAt
 		}
 	}
+	summaryMetrics {
+		name
+		title
+		value {
+			__typename
+			unit
+			... on EntitySummaryNumericMetricValue {
+				__typename
+				numericValue
+			}
+			... on EntitySummaryStringMetricValue {
+				__typename
+				stringValue
+			}
+		}
+	}
 	tags {
 		key
 		values
@@ -1152,8 +2268,15 @@ const getEntityQuery = `query(
 			value
 		}
 	}
+	tracingSummary {
+		errorTraceCount
+		percentOfAllErrorTraces
+	}
 	type
-	... on ApmApplicationEntity {
+	uiTemplates {
+		template
+	}
+	... on ApmAgentInstrumentedServiceEntity {
 		__typename
 		account {
 			id
@@ -1166,6 +2289,9 @@ const getEntityQuery = `query(
 			jsErrorRate
 			pageLoadThroughput
 			pageLoadTimeAverage
+		}
+		apmSettings {
+			tracerType
 		}
 		apmSummary {
 			apdexScore
@@ -1180,6 +2306,9 @@ const getEntityQuery = `query(
 			webThroughput
 		}
 		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		deployments {
 			changelog
 			description
@@ -1188,6 +2317,19 @@ const getEntityQuery = `query(
 			timestamp
 			user
 		}
+		errorGroupCount {
+			count
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		language
 		metricNormalizationRules {
 			action
@@ -1195,14 +2337,23 @@ const getEntityQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
+		}
+		recentAgentActivity {
+			activityType
+			description
+			permalink
+			timestamp
 		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1210,7 +2361,11 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -1224,12 +2379,148 @@ const getEntityQuery = `query(
 			apdexTarget
 			serverSideConfig
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+	}
+	... on ApmApplicationEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		apmBrowserSummary {
+			ajaxRequestThroughput
+			ajaxResponseTimeAverage
+			jsErrorRate
+			pageLoadThroughput
+			pageLoadTimeAverage
+		}
+		apmSettings {
+			tracerType
+		}
+		apmSummary {
+			apdexScore
+			errorRate
+			hostCount
+			instanceCount
+			nonWebResponseTimeAverage
+			nonWebThroughput
+			responseTimeAverage
+			throughput
+			webResponseTimeAverage
+			webThroughput
+		}
+		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		deployments {
+			changelog
+			description
+			permalink
+			revision
+			timestamp
+			user
+		}
+		errorGroupCount {
+			count
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		language
+		metricNormalizationRules {
+			action
+			applicationGuid
+			applicationName
+			createdAt
+			enabled
+			evalOrder
+			id
+			matchExpression
+			notes
+			replacement
+			terminateChain
+		}
+		recentAgentActivity {
+			activityType
+			description
+			permalink
+			timestamp
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		runningAgentVersions {
+			maxVersion
+			minVersion
+		}
+		settings {
+			apdexTarget
+			serverSideConfig
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on ApmAgentInstrumentedServiceEntity {
+			__typename
 		}
 	}
 	... on ApmDatabaseInstanceEntity {
@@ -1239,11 +2530,25 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		host
 		portOrPath
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1251,11 +2556,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1263,6 +2576,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 		vendor
 	}
@@ -1273,14 +2593,28 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		externalSummary {
 			responseTimeAverage
 			throughput
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
 		}
 		host
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1288,11 +2622,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1300,6 +2642,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on BrowserApplicationEntity {
@@ -1321,20 +2670,36 @@ const getEntityQuery = `query(
 			spaResponseTimeAverage
 			spaResponseTimeMedian
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		metricNormalizationRules {
 			action
 			applicationGuid
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1342,7 +2707,11 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -1356,12 +2725,23 @@ const getEntityQuery = `query(
 		settings {
 			apdexTarget
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on DashboardEntity {
@@ -1372,12 +2752,29 @@ const getEntityQuery = `query(
 			reportingEventTypes
 		}
 		createdAt
+		createdAtInternal
 		dashboardParentGuid
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		description
+		descriptionInternal
+		editableInternal
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		owner {
 			email
 			userId
 		}
+		ownerEmailInternal
 		pages {
 			createdAt
 			description
@@ -1385,10 +2782,22 @@ const getEntityQuery = `query(
 			name
 			updatedAt
 		}
+		pagesInternal {
+			createdAt
+			description
+			editable
+			gridColumnCount
+			guid
+			name
+			ownerEmail
+			updatedAt
+			visibility
+		}
 		permissions
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1396,11 +2805,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1409,7 +2826,16 @@ const getEntityQuery = `query(
 		tagsWithMetadata {
 			key
 		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
 		updatedAt
+		updatedAtInternal
+		visibilityInternal
 	}
 	... on ExternalEntity {
 		__typename
@@ -1418,9 +2844,23 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1428,11 +2868,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1440,6 +2888,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on GenericEntity {
@@ -1449,9 +2904,23 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1459,11 +2928,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1471,6 +2948,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on GenericInfrastructureEntity {
@@ -1480,10 +2964,24 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		integrationTypeCode
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1491,11 +2989,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1503,6 +3009,73 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+	}
+	... on GenericServiceEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on InfrastructureAwsLambdaFunctionEntity {
@@ -1512,10 +3085,24 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		integrationTypeCode
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1523,19 +3110,34 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
 		}
 		runtime
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on InfrastructureHostEntity {
@@ -1544,6 +3146,26 @@ const getEntityQuery = `query(
 			id
 			name
 			reportingEventTypes
+		}
+		availableServices {
+			displayName
+			guid
+			processId
+			status
+			strategy
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
 		}
 		hostSummary {
 			cpuUtilizationPercent
@@ -1556,6 +3178,7 @@ const getEntityQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1563,11 +3186,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1575,6 +3206,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on MobileApplicationEntity {
@@ -1585,16 +3223,31 @@ const getEntityQuery = `query(
 			reportingEventTypes
 		}
 		applicationId
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		metricNormalizationRules {
 			action
 			applicationGuid
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		mobileSummary {
 			appLaunchCount
@@ -1611,6 +3264,7 @@ const getEntityQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1618,11 +3272,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1630,6 +3292,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on SecureCredentialEntity {
@@ -1639,10 +3308,24 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
 		description
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1650,7 +3333,11 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
@@ -1661,6 +3348,10 @@ const getEntityQuery = `query(
 			failingMonitorCount
 			monitorCount
 		}
+		summaryMetrics {
+			name
+			title
+		}
 		tags {
 			key
 			values
@@ -1668,7 +3359,82 @@ const getEntityQuery = `query(
 		tagsWithMetadata {
 			key
 		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
 		updatedAt
+	}
+	... on ServiceEntity {
+		__typename
+		account {
+			id
+			name
+			reportingEventTypes
+		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
+		recentAlertViolations {
+			agentUrl
+			alertSeverity
+			alertStatus
+			closedAt
+			label
+			level
+			openedAt
+			violationId
+			violationUrl
+		}
+		relatedDashboards {
+			dashboardGuids
+		}
+		relatedEntities {
+			count
+			nextCursor
+		}
+		relationships {
+			type
+		}
+		summaryMetrics {
+			name
+			title
+		}
+		tags {
+			key
+			values
+		}
+		tagsWithMetadata {
+			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on ApmAgentInstrumentedServiceEntity {
+			__typename
+			applicationId
+			language
+		}
+		... on GenericServiceEntity {
+			__typename
+		}
 	}
 	... on SyntheticMonitorEntity {
 		__typename
@@ -1677,8 +3443,24 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		monitorId
 		monitorSummary {
+			loadSizeAverage
+			loadTimeP50
+			loadTimeP95
 			locationsFailing
 			locationsRunning
 			status
@@ -1690,6 +3472,7 @@ const getEntityQuery = `query(
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1697,11 +3480,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1709,6 +3500,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on ThirdPartyServiceEntity {
@@ -1718,9 +3516,23 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1728,11 +3540,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1740,6 +3560,16 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
+		}
+		... on GenericServiceEntity {
+			__typename
 		}
 	}
 	... on UnavailableEntity {
@@ -1749,9 +3579,23 @@ const getEntityQuery = `query(
 			name
 			reportingEventTypes
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1759,11 +3603,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1771,6 +3623,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 	}
 	... on WorkloadEntity {
@@ -1787,9 +3646,31 @@ const getEntityQuery = `query(
 			id
 			name
 		}
+		dashboardTemplates {
+			mosaicTemplate
+		}
+		errorGroupCount {
+			count
+		}
+		errorGroupNotificationPolicy {
+			id
+			name
+			workloadGuid
+		}
+		goldenSignalValues {
+			fullyQualifiedSignalName
+			name
+			summaryValue
+			units
+			values
+		}
+		goldenSignalValuesV2 {
+			timeIndex
+		}
 		recentAlertViolations {
 			agentUrl
 			alertSeverity
+			alertStatus
 			closedAt
 			label
 			level
@@ -1797,11 +3678,19 @@ const getEntityQuery = `query(
 			violationId
 			violationUrl
 		}
+		relatedDashboards {
+			dashboardGuids
+		}
 		relatedEntities {
+			count
 			nextCursor
 		}
 		relationships {
 			type
+		}
+		summaryMetrics {
+			name
+			title
 		}
 		tags {
 			key
@@ -1809,6 +3698,13 @@ const getEntityQuery = `query(
 		}
 		tagsWithMetadata {
 			key
+		}
+		tracingSummary {
+			errorTraceCount
+			percentOfAllErrorTraces
+		}
+		uiTemplates {
+			template
 		}
 		updatedAt
 		workloadStatus {
@@ -1879,10 +3775,17 @@ const getEntitySearchQuery = `query(
 	count
 	query
 	results {
+		accounts {
+			id
+			inRegion
+			name
+			reportingEventTypes
+		}
 		entities {
 			__typename
 			accountId
 			alertSeverity
+			alertStatus
 			domain
 			entityType
 			guid
@@ -1891,10 +3794,18 @@ const getEntitySearchQuery = `query(
 			permalink
 			reporting
 			type
+			... on ApmAgentInstrumentedServiceEntityOutline {
+				__typename
+				applicationId
+				language
+			}
 			... on ApmApplicationEntityOutline {
 				__typename
 				applicationId
 				language
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+				}
 			}
 			... on ApmDatabaseInstanceEntityOutline {
 				__typename
@@ -1929,6 +3840,9 @@ const getEntitySearchQuery = `query(
 				__typename
 				integrationTypeCode
 			}
+			... on GenericServiceEntityOutline {
+				__typename
+			}
 			... on InfrastructureAwsLambdaFunctionEntityOutline {
 				__typename
 				integrationTypeCode
@@ -1947,6 +3861,17 @@ const getEntitySearchQuery = `query(
 				secureCredentialId
 				updatedAt
 			}
+			... on ServiceEntityOutline {
+				__typename
+				... on ApmAgentInstrumentedServiceEntityOutline {
+					__typename
+					applicationId
+					language
+				}
+				... on GenericServiceEntityOutline {
+					__typename
+				}
+			}
 			... on SyntheticMonitorEntityOutline {
 				__typename
 				monitorId
@@ -1956,6 +3881,9 @@ const getEntitySearchQuery = `query(
 			}
 			... on ThirdPartyServiceEntityOutline {
 				__typename
+				... on GenericServiceEntityOutline {
+					__typename
+				}
 			}
 			... on UnavailableEntityOutline {
 				__typename
@@ -1965,6 +3893,10 @@ const getEntitySearchQuery = `query(
 				createdAt
 				updatedAt
 			}
+		}
+		entityTypes {
+			domain
+			type
 		}
 		nextCursor
 	}
